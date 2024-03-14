@@ -1,12 +1,13 @@
 edition: 1.0.0
-name: my-framework-app
-access: "undefined"
+name: feishu-bot-app
+access: "undefined" #  秘钥别名
 
-vars:
-  region: cn-hangzhou
+vars: # 全局变量
+  region: "cn-hangzhou"
+
 
 services:
-  framework:
+  feishubot:
     component: fc
     actions:
       pre-deploy:
@@ -14,16 +15,19 @@ services:
           path: ./code
         - run: GO111MODULE=on GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o target/main main.go
           path: ./code
-
-    props:
-      region:  ${vars.region}
+      # post-deploy:
+      #   - run: rm -rf target
+      #     path: ./code
+    props: # 组件的属性值
+      region: ${vars.region} # 关于变量的使用方法，可以参考：https://www.serverless-devs.com/serverless-devs/yaml#变量赋值
       service:
-        name: "go-feishu-bot"
-      function:
-        name: go-feishu-chatbot-24ej
+        name: "feishubot"
         description: "Serverless Devs Website Service"
+      function:
+        name: "go-feishu-chatbot"
+        description: 'a simple feishubot by serverless devs'
         codeUri: './code'
-        cAPort: 9000
+        cAPort: 8899
         customRuntimeConfig:
           command:
             - ./target/main
@@ -35,19 +39,19 @@ services:
         runtime: custom
         timeout: 30
         internetAccess: true
-        triggers:
-          - name: httpTrigger
-            type: http
-            config:
-              authType: anonymous
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+      customDomains:
+        - domainName: auto
+          protocol: HTTP
+          routeConfigs:
+            - path: /*
               methods:
                 - GET
                 - POST
-        customDomains:
-          - domainName: auto
-            protocol: HTTP
-            routeConfigs:
-              - path: /*
-                methods:
-                  - GET
-                  - POST
