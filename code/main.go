@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	recv "feishu-chatbot/recv"
 	"fmt"
+	"log"
 	"regexp"
 
 	"github.com/spf13/viper"
@@ -68,6 +69,7 @@ func parseContent(content string) string {
 	//"{\"text\":\"@_user_1  hahaha\"}",
 	//only get text content hahaha
 	var contentMap map[string]interface{}
+	log.Printf("content is:%s", content)
 	err := json.Unmarshal([]byte(content), &contentMap)
 	if err != nil {
 		fmt.Println(err)
@@ -107,6 +109,6 @@ func main() {
 	fmt.Println("http server started",
 		"http://localhost:9000/webhook/event")
 
-	r.Run(":8899")
+	r.Run(":9000")
 
 }
