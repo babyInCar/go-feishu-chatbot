@@ -2,6 +2,7 @@ package calc
 
 import (
 	"fmt"
+	"gopkg.in/Knetic/govaluate.v2"
 	"strings"
 )
 

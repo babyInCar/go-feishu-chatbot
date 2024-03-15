@@ -1,0 +1,26 @@
+{
+  "statefulConfig": {
+    "triggerName": "httpTrigger",
+    "description": "",
+    "triggerId": "0845575c-ee4d-4a53-b425-bbea673f4092",
+    "sourceArn": null,
+    "triggerType": "http",
+    "invocationRole": null,
+    "qualifier": "LATEST",
+    "urlInternet": "https://go-feis-chatbot-feishuchatbot-womazazsvl.cn-hangzhou.fcapp.run",
+    "urlIntranet": "https://go-feis-chatbot-feishuchatbot-womazazsvl.cn-hangzhou-vpc.fcapp.run",
+    "triggerConfig": {
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "authType": "anonymous",
+      "disableURLInternet": false
+    },
+    "createdTime": "2024-03-15T03:33:39Z",
+    "lastModifiedTime": "2024-03-15T12:05:17Z",
+    "status": null,
+    "targetArn": null,
+    "name": "httpTrigger"
+  }
+}

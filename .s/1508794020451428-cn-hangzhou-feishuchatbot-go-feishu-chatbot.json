@@ -1,0 +1,45 @@
+{
+  "statefulConfig": {
+    "functionId": "c30bfe4e-62a4-4037-a1e9-5ba7013c6150",
+    "functionName": "go-feishu-chatbot",
+    "description": "a simple feishubot by serverless devs",
+    "runtime": "custom",
+    "handler": "index.handler",
+    "timeout": 30,
+    "initializer": "",
+    "initializationTimeout": 3,
+    "codeSize": 6904547,
+    "codeChecksum": "12487837300136680664",
+    "memorySize": 128,
+    "gpuMemorySize": null,
+    "environmentVariables": {},
+    "createdTime": "2024-03-15T03:33:39Z",
+    "lastModifiedTime": "2024-03-15T12:05:17Z",
+    "instanceConcurrency": 20,
+    "instanceSoftConcurrency": null,
+    "customContainerConfig": null,
+    "caPort": 9000,
+    "instanceType": "e1",
+    "layers": null,
+    "layersArnV2": null,
+    "instanceLifecycleConfig": {
+      "preFreeze": {
+        "handler": "",
+        "timeout": 3
+      },
+      "preStop": {
+        "handler": "",
+        "timeout": 3
+      }
+    },
+    "customDNS": null,
+    "customRuntimeConfig": {
+      "command": [
+        "./target/main"
+      ],
+      "args": null
+    },
+    "customHealthCheckConfig": null,
+    "name": "go-feishu-chatbot"
+  }
+}

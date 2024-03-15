@@ -8,6 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/larksuite/oapi-sdk-gin v1.0.0
 	github.com/spf13/viper v1.14.0
+	gopkg.in/Knetic/govaluate.v2 v2.3.0
 )
 
 require (

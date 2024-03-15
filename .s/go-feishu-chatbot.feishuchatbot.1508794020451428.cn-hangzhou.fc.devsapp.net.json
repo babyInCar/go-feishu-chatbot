@@ -1,0 +1,38 @@
+{
+  "domainName": "go-feishu-chatbot.feishuchatbot.1508794020451428.cn-hangzhou.fc.devsapp.net",
+  "accountId": "1508794020451428",
+  "protocol": "HTTP",
+  "certConfig": {
+    "certName": null,
+    "privateKey": null,
+    "certificate": null
+  },
+  "tlsConfig": {
+    "minVersion": null,
+    "maxVersion": null,
+    "cipherSuites": null
+  },
+  "apiVersion": "2016-08-15",
+  "routeConfig": {
+    "routes": [
+      {
+        "path": "/*",
+        "accountId": null,
+        "apiVersion": "",
+        "serviceName": "feishuchatbot",
+        "functionName": "go-feishu-chatbot",
+        "qualifier": null,
+        "methods": null,
+        "rewriteConfig": null,
+        "innerRewriteConfig": null
+      }
+    ]
+  },
+  "createdTime": "2024-03-15T03:33:41Z",
+  "lastModifiedTime": "2024-03-15T12:06:55Z",
+  "keepFullPath": null,
+  "subdomainCount": null,
+  "wafConfig": {
+    "enableWAF": false
+  }
+}
