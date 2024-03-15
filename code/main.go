@@ -58,6 +58,7 @@ func sendMsg(msg string, chatId *string) {
 		fmt.Println(resp.Code, resp.Msg, resp.RequestId())
 	}
 }
+
 func msgFilter(msg string) string {
 	//replace @到下一个非空的字段 为 ''
 	regex := regexp.MustCompile(`@[^ ]*`)
@@ -86,7 +87,7 @@ func main() {
 			fmt.Println(larkcore.Prettify(event))
 			content := event.Event.Message.Content
 			contentStr := parseContent(*content)
-			out, err := recv.SendMsg(contentStr)
+			out, err := recv.CalcStr(contentStr)
 			if err != nil {
 				fmt.Println(err)
 			}
