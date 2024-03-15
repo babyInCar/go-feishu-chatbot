@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	recv "feishu-chatbot/recv"
 	"fmt"
+	"path/filepath"
 	"regexp"
 
 	"github.com/spf13/viper"
@@ -13,11 +14,11 @@ import (
 
 	sdkginext "github.com/larksuite/oapi-sdk-gin"
 
+	. "feishu-chatbot/config"
+	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
 	"github.com/larksuite/oapi-sdk-go/v3/event/dispatcher"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
-
-	lark "github.com/larksuite/oapi-sdk-go/v3"
 )
 
 func setEnv() {
@@ -87,11 +88,11 @@ func main() {
 			fmt.Println(larkcore.Prettify(event))
 			content := event.Event.Message.Content
 			contentStr := parseContent(*content)
-			out, err := recv.CalcStr(contentStr)
+			out, err := recv.SendMsg(contentStr, *event.Event.Message.ChatId)
 			if err != nil {
 				fmt.Println(err)
 			}
-			sendMsg(recv.FormatMathOut(out), event.Event.Message.ChatId)
+			sendMsg(out, event.Event.Message.ChatId)
 			return nil
 		})
 
@@ -101,6 +102,15 @@ func main() {
 			"message": "pong",
 		})
 	})
+	// 初始化相关配置
+	dir, err := filepath.Abs(filepath.Dir("../"))
+	if err != nil {
+		fmt.Println("error is:", err)
+	}
+	if err := InitConfig(fmt.Sprintf("%s/config.json", dir)); err != nil {
+		fmt.Println("error is:", err)
+		panic(err.Error())
+	}
 
 	// 在已有 Gin 实例上注册消息处理路由
 	r.POST("/webhook/event", sdkginext.NewEventHandlerFunc(handler))

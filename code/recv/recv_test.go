@@ -6,36 +6,36 @@ import (
 
 func TestCalc(t *testing.T) {
 
-	//out, err := sendMsg("1+1")
-	//if err != nil {
-	//	t.Error(err)
-	//}
-	//
-	//if reponse != 2 {
-	//	t.Error("1+1 should be 2")
-	//}
+	out, err := SendMsg("hello", "12312312")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != "Hi, What can I do for you!" {
+		t.Error("Hello/hello should be Hi, What can I do for you!")
+	}
 }
 
 func TestCalc2(t *testing.T) {
-	//
-	//out, err := sendMsg("1+2")
-	//if err != nil {
-	//	t.Error(err)
-	//}
-	//
-	//if out != 3 {
-	//	t.Error("1+2 should be 3")
-	//}
+
+	out, err := SendMsg("thanks", "23412313")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != "It's my pleasure" {
+		t.Error("Thanks/thanks should be It's my pleasure")
+	}
 }
 
-//func TestCalc3(t *testing.T) {
-//	//22*32
-//	out, err := CalcStr("22*32")
-//	if err != nil {
-//		t.Error(err)
-//	}
-//
-//	if out != 704 {
-//		t.Error("22*32 should be 704")
-//	}
-//}
+func TestCalc3(t *testing.T) {
+	// Pay success
+	out, err := SendMsg("success", "12312412")
+	if err != nil {
+		t.Error(err)
+	}
+
+	if out != "Congratulations, Pay success!" {
+		t.Error("pay success should reply Congratulations, Pay success!")
+	}
+}
