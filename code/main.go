@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	recv "feishu-chatbot/recv"
 	"fmt"
 	"log"
 	"regexp"
@@ -85,16 +84,16 @@ func main() {
 	handler := dispatcher.NewEventDispatcher(viper.GetString(
 		"APP_VERIFICATION_TOKEN"), viper.GetString("APP_ENCRYPT_KEY")).
 		OnP2MessageReceiveV1(func(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
+			// 处理消息 event，这里简单打印消息的内容
 			fmt.Println(larkcore.Prettify(event))
-			content := event.Event.Message.Content
-			contentStr := parseContent(*content)
-			out, err := recv.CalcStr(contentStr)
-			if err != nil {
-				fmt.Println(err)
-			}
-			sendMsg(recv.FormatMathOut(out), event.Event.Message.ChatId)
+			fmt.Println(event.RequestId())
 			return nil
-		})
+		}).OnP2MessageReadV1(func(ctx context.Context, event *larkim.P2MessageReadV1) error {
+		// 处理消息 event，这里简单打印消息的内容
+		fmt.Println(larkcore.Prettify(event))
+		fmt.Println(event.RequestId())
+		return nil
+	})
 
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
