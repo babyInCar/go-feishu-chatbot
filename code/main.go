@@ -86,7 +86,7 @@ func main() {
 			fmt.Println(larkcore.Prettify(event))
 			content := event.Event.Message.Content
 			contentStr := parseContent(*content)
-			out, err := recv.sendMsg(contentStr)
+			out, err := recv.SendMsg(contentStr)
 			if err != nil {
 				fmt.Println(err)
 			}

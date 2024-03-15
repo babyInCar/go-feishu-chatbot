@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func sendMsg(str string) (string, error) {
+func SendMsg(str string) (string, error) {
 	fmt.Println(str)
 
 	// 把字母统一转程小写
