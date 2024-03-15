@@ -4,17 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
+	"github.com/larksuite/oapi-sdk-go/v3/core/httpserverext"
+	larkevent "github.com/larksuite/oapi-sdk-go/v3/event"
+	"github.com/larksuite/oapi-sdk-go/v3/event/dispatcher"
 	"log"
+	"net/http"
 	"regexp"
 
 	"github.com/spf13/viper"
 
-	"github.com/gin-gonic/gin"
-
-	sdkginext "github.com/larksuite/oapi-sdk-gin"
-
-	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
-	"github.com/larksuite/oapi-sdk-go/v3/event/dispatcher"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 
 	lark "github.com/larksuite/oapi-sdk-go/v3"
@@ -76,38 +75,63 @@ func parseContent(content string) string {
 	text := contentMap["text"].(string)
 	return msgFilter(text)
 }
-func main() {
-	client = lark.NewClient(viper.GetString("APP_ID"),
-		viper.GetString("APP_SECRET"))
 
-	//// 注册消息处理器
-	handler := dispatcher.NewEventDispatcher(viper.GetString(
-		"APP_VERIFICATION_TOKEN"), viper.GetString("APP_ENCRYPT_KEY")).
-		OnP2MessageReceiveV1(func(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
-			// 处理消息 event，这里简单打印消息的内容
-			fmt.Println(larkcore.Prettify(event))
-			fmt.Println(event.RequestId())
-			return nil
-		}).OnP2MessageReadV1(func(ctx context.Context, event *larkim.P2MessageReadV1) error {
+//func main() {
+//	client = lark.NewClient(viper.GetString("APP_ID"),
+//		viper.GetString("APP_SECRET"))
+//
+//	//// 注册消息处理器
+//	handler := dispatcher.NewEventDispatcher(viper.GetString(
+//		"APP_VERIFICATION_TOKEN"), viper.GetString("APP_ENCRYPT_KEY")).
+//		OnP2MessageReceiveV1(func(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
+//			// 处理消息 event，这里简单打印消息的内容
+//			fmt.Println(larkcore.Prettify(event))
+//			fmt.Println(event.RequestId())
+//			return nil
+//		}).OnP2MessageReadV1(func(ctx context.Context, event *larkim.P2MessageReadV1) error {
+//		// 处理消息 event，这里简单打印消息的内容
+//		fmt.Println(larkcore.Prettify(event))
+//		fmt.Println(event.RequestId())
+//		return nil
+//	})
+//
+//	r := gin.Default()
+//	r.GET("/ping", func(c *gin.Context) {
+//		c.JSON(200, gin.H{
+//			"message": "pong",
+//		})
+//	})
+//
+//	// 在已有 Gin 实例上注册消息处理路由
+//	r.POST("/webhook/event", sdkginext.NewEventHandlerFunc(handler))
+//
+//	fmt.Println("http server started",
+//		"http://localhost:9000/webhook/event")
+//
+//	r.Run(":9000")
+//
+//}
+
+func main() {
+	// 注册消息处理器
+	handler := dispatcher.NewEventDispatcher("verificationToken", "eventEncryptKey").OnP2MessageReceiveV1(func(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
+		// 处理消息 event，这里简单打印消息的内容
+		fmt.Println(larkcore.Prettify(event))
+		fmt.Println(event.RequestId())
+		return nil
+	}).OnP2MessageReadV1(func(ctx context.Context, event *larkim.P2MessageReadV1) error {
 		// 处理消息 event，这里简单打印消息的内容
 		fmt.Println(larkcore.Prettify(event))
 		fmt.Println(event.RequestId())
 		return nil
 	})
 
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	// 注册 http 路由
+	http.HandleFunc("/webhook/event", httpserverext.NewEventHandlerFunc(handler, larkevent.WithLogLevel(larkcore.LogLevelDebug)))
 
-	// 在已有 Gin 实例上注册消息处理路由
-	r.POST("/webhook/event", sdkginext.NewEventHandlerFunc(handler))
-
-	fmt.Println("http server started",
-		"http://localhost:9000/webhook/event")
-
-	r.Run(":9000")
-
+	// 启动 http 服务
+	err := http.ListenAndServe(":9000", nil)
+	if err != nil {
+		panic(err)
+	}
 }
