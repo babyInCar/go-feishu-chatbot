@@ -19,7 +19,7 @@ func GetPayResult(ctx *gin.Context) {
 	}
 	response, msgType, err := service.TransactionSucceed(message)
 
-	service.SendMsg(response, &message.ChatId, msgType)
+	err = service.SendMsg(ctx, response, &message.ChatId, msgType)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"code":    200,

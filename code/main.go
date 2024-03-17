@@ -7,11 +7,10 @@ import (
 	"feishu-chatbot/initialize"
 	"feishu-chatbot/service"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"path/filepath"
 	"regexp"
-
-	"github.com/gin-gonic/gin"
 
 	sdkginext "github.com/larksuite/oapi-sdk-gin"
 
@@ -55,8 +54,7 @@ func parseContent(content string) string {
 func main() {
 	//client = lark.NewClient(viper.GetString("APP_ID"),
 	//	viper.GetString("APP_SECRET"))
-
-	//// 注册消息处理器
+	// 注册消息处理器
 	handler := dispatcher.NewEventDispatcher(viper.GetString(
 		"APP_VERIFICATION_TOKEN"), viper.GetString("APP_ENCRYPT_KEY")).
 		OnP2MessageReceiveV1(func(ctx context.Context, event *larkim.P2MessageReceiveV1) error {
@@ -68,7 +66,9 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			go service.SendMsg(out, event.Event.Message.ChatId, msgType)
+			go func() {
+				_ = service.SendMsg(ctx, out, event.Event.Message.ChatId, msgType)
+			}()
 			return nil
 		})
 

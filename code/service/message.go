@@ -7,6 +7,7 @@ import (
 	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
 	"github.com/spf13/viper"
+	"log"
 	"strings"
 )
 
@@ -40,11 +41,13 @@ func GenMsg(str string, chatId string, messageId string, createTime string) (str
 	} else {
 		response = "Sorry, I don't understand what you say![What?]"
 	}
-	err := CreateMessage(expression, chatId, messageId, createTime)
-	if err != nil {
-		fmt.Println(err)
-		return "error", msgType, nil
-	}
+	fmt.Println(expression, chatId, messageId, createTime)
+	go func() {
+		if err := CreateMessage(expression, chatId, messageId, createTime); err != nil {
+			log.Printf("Create database data fail: %v\n", err)
+		}
+	}()
+
 	return response, msgType, nil
 	//case <-time.After(3 * time.Second):
 	//	time.Sleep(time.Millisecond * 100)
@@ -68,7 +71,7 @@ func TransactionSucceed(message Reply) (string, string, error) {
 	return GenMsg(message.Content, message.ChatId, message.MessageId, message.CreateTime)
 }
 
-func SendMsg(msg string, chatId *string, msgType string) {
+func SendMsg(ctx context.Context, msg string, chatId *string, msgType string) (err error) {
 	client = lark.NewClient(viper.GetString("APP_ID"),
 		viper.GetString("APP_SECRET"))
 	content := larkim.NewTextMsgBuilder().
@@ -84,13 +87,23 @@ func SendMsg(msg string, chatId *string, msgType string) {
 			Build()).
 		Build())
 
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+		log.Println(resp)
+	}
 	// 处理错误
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("Send Message failed!")
+		return err
 	}
 
 	// 服务端错误处理
 	if !resp.Success() {
 		fmt.Println(resp.Code, resp.Msg, resp.RequestId())
+		log.Fatalf("Server Error, message is:%s", resp.Msg)
+		return err
 	}
+	return nil
 }
