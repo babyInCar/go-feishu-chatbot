@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 	"encoding/json"
-	recv "feishu-chatbot/recv"
+	"feishu-chatbot/api"
+	"feishu-chatbot/initialize"
+	"feishu-chatbot/service"
 	"fmt"
+	"github.com/spf13/viper"
 	"path/filepath"
 	"regexp"
-
-	"github.com/spf13/viper"
 
 	"github.com/gin-gonic/gin"
 
 	sdkginext "github.com/larksuite/oapi-sdk-gin"
 
 	. "feishu-chatbot/config"
-	lark "github.com/larksuite/oapi-sdk-go/v3"
 	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
 	"github.com/larksuite/oapi-sdk-go/v3/event/dispatcher"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
@@ -29,35 +29,10 @@ func setEnv() {
 	}
 }
 
-var client *lark.Client
+//var client *lark.Client
 
 func init() {
 	setEnv()
-}
-
-func sendMsg(msg string, chatId *string) {
-	content := larkim.NewTextMsgBuilder().
-		Text(msg).
-		Build()
-
-	resp, err := client.Im.Message.Create(context.Background(), larkim.NewCreateMessageReqBuilder().
-		ReceiveIdType(larkim.ReceiveIdTypeChatId).
-		Body(larkim.NewCreateMessageReqBodyBuilder().
-			MsgType(larkim.MsgTypeText).
-			ReceiveId(*chatId).
-			Content(content).
-			Build()).
-		Build())
-
-	// 处理错误
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// 服务端错误处理
-	if !resp.Success() {
-		fmt.Println(resp.Code, resp.Msg, resp.RequestId())
-	}
 }
 
 func msgFilter(msg string) string {
@@ -78,8 +53,8 @@ func parseContent(content string) string {
 	return msgFilter(text)
 }
 func main() {
-	client = lark.NewClient(viper.GetString("APP_ID"),
-		viper.GetString("APP_SECRET"))
+	//client = lark.NewClient(viper.GetString("APP_ID"),
+	//	viper.GetString("APP_SECRET"))
 
 	//// 注册消息处理器
 	handler := dispatcher.NewEventDispatcher(viper.GetString(
@@ -88,11 +63,12 @@ func main() {
 			fmt.Println(larkcore.Prettify(event))
 			content := event.Event.Message.Content
 			contentStr := parseContent(*content)
-			out, err := recv.SendMsg(contentStr, *event.Event.Message.ChatId)
+			out, msgType, err := service.GenMsg(contentStr, *event.Event.Message.ChatId, *event.Event.Message.MessageId, *event.Event.Message.CreateTime)
+			fmt.Printf("out is: %s\n", out)
 			if err != nil {
 				fmt.Println(err)
 			}
-			sendMsg(out, event.Event.Message.ChatId)
+			go service.SendMsg(out, event.Event.Message.ChatId, msgType)
 			return nil
 		})
 
@@ -102,6 +78,8 @@ func main() {
 			"message": "pong",
 		})
 	})
+	// 处理外部的交易连接请求，可用PostMan测试
+	r.POST("/transaction", api.GetPayResult)
 	// 初始化相关配置
 	dir, err := filepath.Abs(filepath.Dir("../"))
 	if err != nil {
@@ -111,6 +89,8 @@ func main() {
 		fmt.Println("error is:", err)
 		panic(err.Error())
 	}
+	// 初始化Mysql的连接
+	initialize.InitDB(Conf.DatabaseConfig)
 
 	// 在已有 Gin 实例上注册消息处理路由
 	r.POST("/webhook/event", sdkginext.NewEventHandlerFunc(handler))

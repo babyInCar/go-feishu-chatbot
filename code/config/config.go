@@ -15,14 +15,6 @@ type Config struct {
 	*DatabaseConfig `json:"database"`
 }
 
-type EmailConfig struct {
-	Host string `json:"host"`
-	Port int    `json:"port"`
-	From string `json:"from"`
-	User string `json:"username"`
-	Pwd  string `json:"password"`
-}
-
 type LogConfig struct {
 	Level      string `json:"level"`
 	Filename   string `json:"filename"`
