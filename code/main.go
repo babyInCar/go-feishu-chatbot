@@ -81,7 +81,7 @@ func main() {
 	// 处理外部的交易连接请求，可用PostMan测试
 	r.POST("/transaction", api.GetPayResult)
 	// 初始化相关配置
-	dir, err := filepath.Abs(filepath.Dir("../"))
+	dir, err := filepath.Abs(filepath.Dir("./"))
 	if err != nil {
 		fmt.Println("error is:", err)
 	}
